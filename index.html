@@ -207,10 +207,19 @@
     .booking-preview p { color: var(--dim); max-width: 480px; margin: 0 auto 36px; font-size: 0.95rem; }
     /* TESTIMONIALS PREVIEW */
     .testimonials-preview { padding: 96px 72px; background: var(--black); }
-    .testimonials-preview .inner { max-width: 700px; margin: 0 auto; }
+    .testimonials-preview .inner { max-width: 1000px; margin: 0 auto; }
     .testimonial-placeholder { border: 1px solid var(--border); padding: 48px; text-align: center; }
     .testimonial-placeholder p { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.2rem; font-style: italic; color: var(--dim); margin-bottom: 8px; }
     .testimonial-placeholder small { color: var(--dim); font-size: 0.75rem; letter-spacing: 0.06em; }
+    .home-testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 32px; }
+    @media (min-width: 720px) { .home-testimonials-grid { grid-template-columns: 1fr 1fr; } }
+    .home-testimonial-card { background: var(--charcoal); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+    .home-testimonial-stars { color: var(--gold); font-size: 0.9rem; letter-spacing: 0.1em; margin-bottom: 12px; }
+    .home-testimonial-text { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.05rem; font-style: italic; color: var(--light); line-height: 1.7; margin-bottom: 16px; }
+    .home-testimonial-author { color: var(--gold); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .home-testimonials-viewall { text-align: center; margin-top: 40px; }
+    .home-testimonials-viewall a { color: var(--gold); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1px solid var(--gold); padding-bottom: 4px; }
+    .home-testimonials-viewall a:hover { opacity: 0.8; }
     /* MOBILE */
     @media (max-width: 900px) {
       .hero { padding: 0 24px 60px; }
@@ -331,12 +340,43 @@
     <div class="inner">
       <p class="section-label fade-up" data-en="Reviews" data-es="Testimonios">Testimonios</p>
       <h2 class="fade-up">Lo Que Dicen</h2>
-      <div class="testimonial-placeholder fade-up">
+      <div id="home-testimonials-grid" class="home-testimonials-grid fade-up"></div>
+      <div id="home-testimonials-viewall" class="home-testimonials-viewall" style="display:none;">
+        <a href="./testimonials.html" data-en="View All Reviews &#x2192;" data-es="Ver Todos los Testimonios &#x2192;">Ver Todos los Testimonios &#x2192;</a>
+      </div>
+      <div id="home-testimonial-placeholder" class="testimonial-placeholder fade-up">
         <p data-en="Be the first to share your experience." data-es="S&#xe9; el primero en compartir tu experiencia.">S&#xe9; el primero en compartir tu experiencia.</p>
         <small><a href="./testimonials.html" style="color:var(--gold);text-decoration:none;" data-en="Share your story &#x2192;" data-es="Comparte tu historia &#x2192;">Comparte tu historia &#x2192;</a></small>
       </div>
     </div>
   </section>
+
+  <script>
+    (function(){
+      fetch('https://curious-lemming-262.convex.site/api/testimonials/approved?slug=venusbalam')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var reviews = (data.testimonials || []);
+          if (!reviews.length) return;
+          var grid = document.getElementById('home-testimonials-grid');
+          var placeholder = document.getElementById('home-testimonial-placeholder');
+          var viewAll = document.getElementById('home-testimonials-viewall');
+          if (placeholder) placeholder.style.display = 'none';
+          reviews.slice(0, 2).forEach(function(r){
+            var stars = '';
+            for (var i = 0; i < (r.rating || 5); i++) stars += '\u2605 ';
+            var card = document.createElement('div');
+            card.className = 'home-testimonial-card';
+            card.innerHTML = '<div class="home-testimonial-stars">' + stars + '</div>'
+              + '<p class="home-testimonial-text">\u201C' + r.reviewText.replace(/</g,'&lt;') + '\u201D</p>'
+              + '<span class="home-testimonial-author">\u2014 ' + r.name.replace(/</g,'&lt;') + '</span>';
+            grid.appendChild(card);
+          });
+          if (reviews.length > 2 && viewAll) viewAll.style.display = 'block';
+        })
+        .catch(function(){});
+    })();
+  </script>
 
   
   <footer>
